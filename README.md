@@ -113,3 +113,6 @@ Props:
 - height: player height (default: 200px)
 - background: player background (default: transparent)
 - @animControl: Returns the lottie-web animation controller for custom event hookup & direct access to the lottie instance.
+
+## NuxtJs
+https://github.com/turopoff/vue-lottie-player-nuxt-demo
