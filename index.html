@@ -1,0 +1,522 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>vue-lottie-player demo</title>
+    <link rel="stylesheet" href="./dist/vue-lottie-player.css" />
+    <style>
+      :root {
+        color-scheme: light;
+        --surface: rgba(255, 255, 255, 0.82);
+        --surface-strong: rgba(255, 255, 255, 0.92);
+        --border: rgba(25, 34, 49, 0.08);
+        --text: #192231;
+        --muted: #5e6b7a;
+        --accent: #1f7aec;
+        --accent-soft: rgba(31, 122, 236, 0.12);
+        --warm: #fff7ed;
+        --cool: #f3f7ff;
+        --shadow: 0 18px 60px rgba(25, 34, 49, 0.12);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        background:
+          radial-gradient(circle at top left, rgba(111, 183, 255, 0.35), transparent 38%),
+          radial-gradient(circle at top right, rgba(250, 204, 21, 0.22), transparent 28%),
+          #f5f1ea;
+        color: var(--text);
+        font-family: "Segoe UI", sans-serif;
+      }
+
+      a {
+        color: inherit;
+      }
+
+      button,
+      input {
+        font: inherit;
+      }
+
+      code {
+        font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+      }
+
+      .demo-shell {
+        max-width: 1180px;
+        margin: 0 auto;
+        padding: 48px 20px 64px;
+      }
+
+      .hero {
+        display: grid;
+        gap: 14px;
+        margin-bottom: 28px;
+      }
+
+      .eyebrow,
+      .panel-label {
+        margin: 0;
+        color: var(--muted);
+        font-size: 0.78rem;
+        font-weight: 700;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+      }
+
+      .hero h1,
+      .panel-header h2,
+      .controls-header h2 {
+        margin: 0;
+      }
+
+      .hero h1 {
+        font-size: clamp(2.4rem, 6vw, 4.4rem);
+        line-height: 0.95;
+      }
+
+      .lede,
+      .meta,
+      .helper-text {
+        margin: 0;
+        color: var(--muted);
+        line-height: 1.6;
+      }
+
+      .hero-links {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+      }
+
+      .hero-links a {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 10px 14px;
+        border-radius: 999px;
+        background: var(--surface-strong);
+        border: 1px solid var(--border);
+        box-shadow: var(--shadow);
+        text-decoration: none;
+      }
+
+      .panel-grid {
+        display: grid;
+        gap: 20px;
+        grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      }
+
+      .panel,
+      .controls {
+        display: grid;
+        gap: 18px;
+        padding: 24px;
+        border-radius: 28px;
+        background: var(--surface);
+        border: 1px solid var(--border);
+        backdrop-filter: blur(14px);
+        box-shadow: var(--shadow);
+      }
+
+      .panel-header,
+      .controls-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+      }
+
+      .ghost-button,
+      .button-row button {
+        appearance: none;
+        border: 0;
+        border-radius: 999px;
+        cursor: pointer;
+        transition:
+          transform 120ms ease,
+          background-color 120ms ease,
+          color 120ms ease;
+      }
+
+      .ghost-button {
+        padding: 10px 14px;
+        background: var(--accent-soft);
+        color: var(--accent);
+        font-weight: 600;
+      }
+
+      .button-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+      }
+
+      .button-row button {
+        padding: 12px 18px;
+        background: var(--text);
+        color: #fff;
+      }
+
+      .ghost-button:hover,
+      .button-row button:hover {
+        transform: translateY(-1px);
+      }
+
+      .meta strong {
+        color: var(--text);
+      }
+
+      .status-chip {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 96px;
+        padding: 8px 12px;
+        border-radius: 999px;
+        background: rgba(25, 34, 49, 0.08);
+        color: var(--muted);
+        font-size: 0.82rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+      }
+
+      .status-chip.live {
+        background: rgba(22, 163, 74, 0.14);
+        color: #0f7a37;
+      }
+
+      .controls {
+        margin-top: 20px;
+      }
+
+      .speed-control {
+        display: grid;
+        gap: 10px;
+        font-weight: 600;
+      }
+
+      .speed-control input {
+        width: 100%;
+      }
+
+      .player-shell {
+        display: grid;
+        place-items: center;
+        min-height: 320px;
+        border-radius: 22px;
+        overflow: hidden;
+      }
+
+      .panel:first-child .player-shell {
+        background: var(--cool);
+      }
+
+      .panel:nth-child(2) .player-shell {
+        background: var(--warm);
+      }
+
+      .placeholder {
+        color: var(--muted);
+      }
+
+      .error-message {
+        margin: 0;
+        padding: 12px 14px;
+        border-radius: 16px;
+        background: rgba(220, 38, 38, 0.1);
+        color: #991b1b;
+      }
+
+      @media (max-width: 700px) {
+        .demo-shell {
+          padding: 28px 14px 40px;
+        }
+
+        .panel,
+        .controls {
+          padding: 18px;
+          border-radius: 22px;
+        }
+
+        .panel-header,
+        .controls-header {
+          align-items: flex-start;
+          flex-direction: column;
+        }
+      }
+    </style>
+    <script type="importmap">
+      {
+        "imports": {
+          "vue": "https://esm.sh/vue@3.5.32",
+          "lottie-web/build/player/lottie_light": "https://esm.sh/lottie-web@5.13.0/build/player/lottie_light"
+        }
+      }
+    </script>
+  </head>
+  <body>
+    <div id="app"></div>
+
+    <script type="module">
+      import { computed, createApp, onMounted, ref, watch } from "vue";
+      import { VueLottiePlayer } from "./dist/vue-lottie-player.js";
+
+      const remoteSources = [
+        {
+          label: "Shape animation",
+          url: "./examples/animations/shape-animation.json"
+        },
+        {
+          label: "Scooter",
+          url: "./examples/animations/scooter.json"
+        }
+      ];
+
+      createApp({
+        components: {
+          VueLottiePlayer
+        },
+        setup() {
+          const remoteSourceIndex = ref(0);
+          const speed = ref(1);
+          const remotePlayer = ref(null);
+          const localPlayer = ref(null);
+          const remoteReadyCount = ref(0);
+          const localReadyCount = ref(0);
+          const localAnimationSource = ref(null);
+          const lastError = ref("");
+
+          const activeRemoteSource = computed(() => remoteSources[remoteSourceIndex.value]);
+          const activeRemotePlayerSource = computed(() => ({
+            kind: "url",
+            value: activeRemoteSource.value.url
+          }));
+          const playersReady = computed(() => {
+            return remoteReadyCount.value > 0 && localReadyCount.value > 0;
+          });
+
+          const applySpeed = () => {
+            remotePlayer.value?.setSpeed?.(speed.value);
+            localPlayer.value?.setSpeed?.(speed.value);
+          };
+
+          const onRemoteReady = animation => {
+            remoteReadyCount.value += 1;
+            animation.setSpeed(speed.value);
+          };
+
+          const onLocalReady = animation => {
+            localReadyCount.value += 1;
+            animation.setSpeed(speed.value);
+          };
+
+          const onError = (scope, error) => {
+            const message = error instanceof Error ? error.message : String(error);
+            lastError.value = `${scope}: ${message}`;
+          };
+
+          const swapRemoteSource = () => {
+            remoteSourceIndex.value = remoteSourceIndex.value === 0 ? 1 : 0;
+          };
+
+          const playAll = () => {
+            remotePlayer.value?.play?.();
+            localPlayer.value?.play?.();
+          };
+
+          const pauseAll = () => {
+            remotePlayer.value?.pause?.();
+            localPlayer.value?.pause?.();
+          };
+
+          const stopAll = () => {
+            remotePlayer.value?.stop?.();
+            localPlayer.value?.stop?.();
+          };
+
+          const getSafeSeekFrame = (playerRef, targetFrame = 45) => {
+            const animation = playerRef.value?.getAnimation?.();
+
+            if (!animation) {
+              return null;
+            }
+
+            const firstFrame = Number(animation.firstFrame ?? 0);
+            const totalFrames = Number(animation.totalFrames ?? 0);
+            const lastFrame = Math.max(firstFrame, firstFrame + totalFrames - 1);
+
+            return Math.min(targetFrame, lastFrame);
+          };
+
+          const seekPreviewFrame = () => {
+            const remoteFrame = getSafeSeekFrame(remotePlayer);
+            const localFrame = getSafeSeekFrame(localPlayer);
+
+            if (remoteFrame !== null) {
+              remotePlayer.value?.goToAndStop?.(remoteFrame, true);
+            }
+
+            if (localFrame !== null) {
+              localPlayer.value?.goToAndStop?.(localFrame, true);
+            }
+          };
+
+          onMounted(async () => {
+            try {
+              const response = await fetch("./examples/animations/scooter.json");
+
+              if (!response.ok) {
+                throw new Error(`Failed to load bundled asset (${response.status})`);
+              }
+
+              localAnimationSource.value = {
+                kind: "data",
+                value: await response.json()
+              };
+            } catch (error) {
+              onError("Local asset", error);
+            }
+          });
+
+          watch(speed, applySpeed);
+
+          return {
+            activeRemotePlayerSource,
+            activeRemoteSource,
+            lastError,
+            localAnimationSource,
+            localPlayer,
+            localReadyCount,
+            onError,
+            onLocalReady,
+            onRemoteReady,
+            pauseAll,
+            playAll,
+            playersReady,
+            remotePlayer,
+            remoteReadyCount,
+            seekPreviewFrame,
+            speed,
+            stopAll,
+            swapRemoteSource
+          };
+        },
+        template: `
+          <main class="demo-shell">
+            <section class="hero">
+              <p class="eyebrow">Vue 3 demo</p>
+              <h1>vue-lottie-player</h1>
+              <p class="lede">
+                GitHub Pages branch root hozir demo landing sifatida ishlaydi. Actions-based deploy yoqilganida esa
+                <code>examples/vue</code> dagi Vite build root sayt sifatida chiqadi.
+              </p>
+              <div class="hero-links">
+                <a href="./README.md">README</a>
+                <a href="./examples/vue/">examples/vue</a>
+                <a href="https://github.com/turopoff/vue-lottie-player">Repository</a>
+              </div>
+            </section>
+
+            <section class="panel-grid">
+              <article class="panel">
+                <div class="panel-header">
+                  <div>
+                    <p class="panel-label">URL source</p>
+                    <h2>{{ activeRemoteSource.label }}</h2>
+                  </div>
+                  <button class="ghost-button" type="button" @click="swapRemoteSource">
+                    Swap source
+                  </button>
+                </div>
+                <div class="player-shell">
+                  <VueLottiePlayer
+                    ref="remotePlayer"
+                    name="remote-demo"
+                    width="100%"
+                    height="320px"
+                    background="#f3f7ff"
+                    loop
+                    :source="activeRemotePlayerSource"
+                    @ready="onRemoteReady"
+                    @error="onError('Remote player', $event)"
+                  />
+                </div>
+                <p class="meta">
+                  Ready events: <strong>{{ remoteReadyCount }}</strong>
+                </p>
+              </article>
+
+              <article class="panel">
+                <div class="panel-header">
+                  <div>
+                    <p class="panel-label">Data source</p>
+                    <h2>Bundled asset</h2>
+                  </div>
+                  <span class="status-chip">source:data</span>
+                </div>
+                <div class="player-shell">
+                  <VueLottiePlayer
+                    v-if="localAnimationSource"
+                    ref="localPlayer"
+                    name="local-demo"
+                    width="100%"
+                    height="320px"
+                    background="#fff7ed"
+                    loop
+                    :source="localAnimationSource"
+                    @ready="onLocalReady"
+                    @error="onError('Local player', $event)"
+                  />
+                  <p v-else class="placeholder">Loading bundled asset...</p>
+                </div>
+                <p class="meta">
+                  Ready events: <strong>{{ localReadyCount }}</strong>
+                </p>
+              </article>
+            </section>
+
+            <section class="controls">
+              <div class="controls-header">
+                <div>
+                  <p class="panel-label">Ref controls</p>
+                  <h2>Playback API</h2>
+                </div>
+                <span class="status-chip" :class="{ live: playersReady }">
+                  {{ playersReady ? "ready" : "loading" }}
+                </span>
+              </div>
+
+              <label class="speed-control">
+                <span>Speed: {{ speed.toFixed(1) }}x</span>
+                <input v-model.number="speed" type="range" min="0.2" max="3" step="0.1" />
+              </label>
+
+              <div class="button-row">
+                <button type="button" @click="playAll">Play</button>
+                <button type="button" @click="pauseAll">Pause</button>
+                <button type="button" @click="stopAll">Stop</button>
+                <button type="button" @click="seekPreviewFrame">Seek preview frame</button>
+              </div>
+
+              <p class="helper-text">
+                Bu root page branch-based GitHub Pages uchun fallback demo. Agar Pages source
+                <code>GitHub Actions</code> ga o‘rnatilsa, mavjud workflow to‘g‘ridan-to‘g‘ri
+                <code>examples/vue/dist</code> ni publish qiladi.
+              </p>
+
+              <p v-if="lastError" class="error-message">{{ lastError }}</p>
+            </section>
+          </main>
+        `
+      }).mount("#app");
+    </script>
+  </body>
+</html>
