@@ -1,118 +1,321 @@
-# Lottie Animation Player for Vue | [demo](https://turopoff.github.io/vue-lottie-player/demo/dist)
+# vue-lottie-player
 
-## Why Lottie?
+Type-safe Vue 3 wrapper around `lottie-web`, with a CSP-friendly default build and an opt-in full build for expression-heavy animations.
 
-#### Flexible After Effects features
+`vue-lottie-player` gives you:
 
-We currently support solids, shape layers, masks, alpha mattes, trim paths, and dash patterns. And we’ll be adding new features on a regular basis.
+- a Vue 3 component and plugin export
+- a typed `source` API for URL- and JSON-based animations
+- a default light-player build that avoids `unsafe-eval`
+- a `/full` entry for animations that depend on After Effects expressions
+- imperative ref controls when you need direct playback access
+- straightforward Nuxt 3 integration with client-only registration
 
-#### Manipulate your animation any way you like
+Examples and focused docs:
 
-You can go forward, backward, and most importantly you can program your animation to respond to any interaction.
-
-#### Small file sizes
-
-Bundle vector animations within your app without having to worry about multiple dimensions or large file sizes. Alternatively, you can decouple animation files from your app’s code entirely by loading them from a JSON API.
-
-[Learn more](http://airbnb.design/introducing-lottie/) › http://airbnb.design/lottie/
-
-Looking for lottie files › https://www.lottiefiles.com/
+- [Vue example app](./examples/vue)
+- [Nuxt 3 example app](./examples/nuxt)
+- [Usage notes](./docs/usage.md)
+- [Props reference](./docs/props.md)
+- [Events reference](./docs/events.md)
 
 ## Installation
 
-Install [vue-lottie-player](https://www.npmjs.com/package/vue-lottie-player)
+`vue` is a peer dependency and should be `^3.4.0` or newer.
 
-```
-npm install --save vue-lottie-player
+```bash
+npm install vue-lottie-player
 ```
 
-Or
-
+```bash
+pnpm add vue-lottie-player
 ```
+
+```bash
 yarn add vue-lottie-player
 ```
 
-## Initialization
+Import the bundled stylesheet once in your app:
 
-Include in it either globally (in main.js) or a Vue component.\
-
-Global:
-
-```js
-// main.js
-import Vue from "vue";
-
-import VueLottiePlayer from "vue-lottie-player";
-Vue.use(VueLottiePlayer);
+```ts
+import "vue-lottie-player/style.css";
 ```
 
-Component:
+## Quick Start
 
-```js
-import VueLottiePlayer from "vue-lottie-player";
-export default {
-  components: {
-    vLottiePlayer: VueLottiePlayer
-  }
-//...
-```
-
-## Usage
+Use the component directly inside a Vue 3 app with the preferred `source` prop:
 
 ```vue
-<script>
-import VueLottiePlayer from "vue-lottie-player";
-export default {
-  name: "MyComponent",
-  components: {
-    vLottiePlayer: VueLottiePlayer
-  }
+<script setup lang="ts">
+import type { AnimationItem } from "lottie-web";
+import "vue-lottie-player/style.css";
+import type { LottieUrlSource } from "vue-lottie-player";
+import { VueLottiePlayer } from "vue-lottie-player";
+
+const source: LottieUrlSource = {
+  kind: "url",
+  value: "/animations/shape-animation.json"
+};
+
+function onReady(animation: AnimationItem) {
+  animation.setSpeed(1.2);
+}
+</script>
+
+<template>
+  <VueLottiePlayer
+    name="hero-animation"
+    width="320px"
+    height="320px"
+    background="#f5f7fb"
+    loop
+    :source="source"
+    @ready="onReady"
+  />
+</template>
+```
+
+## Global Plugin Registration
+
+If you want `<VueLottiePlayer />` available globally:
+
+```ts
+import { createApp } from "vue";
+import App from "./App.vue";
+import "vue-lottie-player/style.css";
+import { VueLottiePlayerPlugin } from "vue-lottie-player";
+
+createApp(App).use(VueLottiePlayerPlugin).mount("#app");
+```
+
+## Using Imported JSON Data
+
+The component can render imported animation JSON through `source.kind = "data"`:
+
+```vue
+<script setup lang="ts">
+import { ref } from "vue";
+import demoAnimation from "./assets/demo-animation.json";
+import "vue-lottie-player/style.css";
+import type {
+  LottieDataSource,
+  VueLottiePlayerInstance
+} from "vue-lottie-player";
+import { VueLottiePlayer } from "vue-lottie-player";
+
+const player = ref<VueLottiePlayerInstance | null>(null);
+
+const source: LottieDataSource = {
+  kind: "data",
+  value: demoAnimation
+};
+
+function play() {
+  player.value?.play();
+}
+
+function pause() {
+  player.value?.pause();
+}
+</script>
+
+<template>
+  <VueLottiePlayer
+    ref="player"
+    name="local-demo"
+    width="100%"
+    height="320px"
+    loop
+    :source="source"
+  />
+
+  <button type="button" @click="play">Play</button>
+  <button type="button" @click="pause">Pause</button>
+</template>
+```
+
+## Nuxt 3
+
+Because `lottie-web` depends on browser APIs, register the plugin on the client and render the component inside `<ClientOnly>`.
+
+`plugins/vue-lottie-player.client.ts`
+
+```ts
+import "vue-lottie-player/style.css";
+import { VueLottiePlayerPlugin } from "vue-lottie-player";
+
+export default defineNuxtPlugin((nuxtApp) => {
+  nuxtApp.vueApp.use(VueLottiePlayerPlugin);
+});
+```
+
+`pages/index.vue`
+
+```vue
+<script setup lang="ts">
+const source = {
+  kind: "url" as const,
+  value: "/animations/shape-animation.json"
 };
 </script>
 
 <template>
-  <div>
-    <div>
-      <h3>From url</h3>
-      <v-lottie-player
-        name="scooterAnim"
-        loop
-        path="https://assets2.lottiefiles.com/packages/lf20_hu2LUv.json"
-      />
-    </div>
-    OR
-    <div>
-      <h3>From local</h3>
-      <vLottiePlayer
-        name="workoutMonkeyAnim"
-        loop
-        :animationData="require('./assets/workout-monkey.json')"
-      />
-    </div>
-  </div>
+  <ClientOnly>
+    <VueLottiePlayer name="nuxt-demo" loop :source="source" />
+  </ClientOnly>
 </template>
 ```
 
-## Configuration
+See the working example in [examples/nuxt](./examples/nuxt).
 
-Props:
+## Default Build vs Full Build
 
-- name: animation name for future reference
-- animationData: animation JSON.
-  ```
-  <v-lottie-player :animationData="require('./assets/workout-monkey.json')" />
-  ```
-- path: the relative path to the animation JSON. (animationData and path are mutually exclusive)
-  ```
-  <v-lottie-player path="https://assets2.lottiefiles.com/packages/lf20_hu2LUv.json" />
-  ```
-- loop: true / false / number (default: false)
-- autoplay: true / false it will start playing as soon as it is ready (default: true)
-- renderer: 'svg' / 'canvas' / 'html' to set the renderer (default: 'svg')
-- width: player width (default: 200px)
-- height: player height (default: 200px)
-- background: player background (default: transparent)
-- @animControl: Returns the lottie-web animation controller for custom event hookup & direct access to the lottie instance.
+The default package uses `lottie-web/build/player/lottie_light`, which is a better fit for environments with strict Content Security Policy rules.
 
-## NuxtJs
-https://github.com/turopoff/vue-lottie-player-nuxt-demo
+If your animation relies on After Effects expressions, import from the full build instead:
+
+```ts
+import "vue-lottie-player/style.css";
+import { VueLottiePlayer, VueLottiePlayerPlugin } from "vue-lottie-player/full";
+```
+
+Use the default entry unless you specifically need expression support.
+
+## API
+
+### Props
+
+| Prop | Type | Default | Notes |
+| --- | --- | --- | --- |
+| `name` | `string` | auto-generated | Optional animation name passed to `lottie-web`. |
+| `source` | `LottieSource` | `null` | Preferred input for new code. |
+| `src` | `string` | `null` | Deprecated URL/path bridge prop. |
+| `animationData` | `object` | `null` | Deprecated bridge prop for imported animation JSON. |
+| `loop` | `boolean \| number` | `false` | Use `true` for infinite loop or a number for finite repeats. |
+| `autoplay` | `boolean` | `true` | Starts playback immediately after load. |
+| `renderer` | `"svg" \| "canvas" \| "html"` | `"svg"` | Rendering mode passed to `lottie-web`. |
+| `width` | `string \| number` | `"200px"` | Numbers are converted to `px`. |
+| `height` | `string \| number` | `"200px"` | Numbers are converted to `px`. |
+| `background` | `string` | `"transparent"` | Container background color. |
+
+### `source` Formats
+
+Use `source` for all new integrations:
+
+```ts
+const urlSource = {
+  kind: "url" as const,
+  value: "/animations/intro.json"
+};
+
+const dataSource = {
+  kind: "data" as const,
+  value: importedAnimationJson
+};
+```
+
+Rules:
+
+- `source` cannot be combined with `src` or `animationData`
+- `src` and `animationData` cannot be combined with each other
+- `src` and `animationData` still work for migration, but they emit a development warning
+
+### Events
+
+| Event | Payload | Description |
+| --- | --- | --- |
+| `ready` | `AnimationItem` | Fired once per load when the underlying animation instance is ready. |
+| `error` | `Error` | Fired when the source is invalid or the animation fails to load. |
+
+### Ref Methods
+
+Access imperative controls by binding a template ref to the component:
+
+- `play()`
+- `pause()`
+- `stop()`
+- `setSpeed(speed)`
+- `setDirection(direction)`
+- `goToAndPlay(value, isFrame)`
+- `goToAndStop(value, isFrame)`
+- `destroy()`
+- `getAnimation()`
+
+`getAnimation()` returns the underlying `lottie-web` `AnimationItem`, so you can call the lower-level API directly when needed.
+
+### Type Exports
+
+The package exports the main public types:
+
+- `LottieSource`
+- `LottieUrlSource`
+- `LottieDataSource`
+- `VueLottiePlayerProps`
+- `VueLottiePlayerInstance`
+
+## Breaking Changes
+
+Compared with `master` (`0.1.x`, Vue 2 line), this branch changes the public API in several important ways:
+
+| Area | `master` | Current branch | Migration |
+| --- | --- | --- | --- |
+| Vue version | Built for Vue 2 and shipped `vue` as a dependency. | Vue 3 only, with `vue` as a peer dependency (`^3.4.0`). | Upgrade the host app to Vue 3 before adopting this release. |
+| Package exports | Default export component plus `Vue.use()` support. | Named exports: `VueLottiePlayer` and `VueLottiePlayerPlugin`. | Replace `import VueLottiePlayer from "vue-lottie-player"` with named imports. |
+| Auto-install | Tried to auto-install when global Vue was present. | No global auto-install behavior. | Register the plugin explicitly with `app.use(VueLottiePlayerPlugin)`. |
+| Component name | Global registration used `vLottiePlayer`, commonly rendered as `<v-lottie-player />`. | Global registration uses `VueLottiePlayer`. | Switch templates to `<VueLottiePlayer />` or `<vue-lottie-player />`. |
+| Source props | `path` and `animationData` were the public loading props. | New typed `source` prop is the preferred API; `path` is removed; `src` and `animationData` are legacy bridge props. | Replace `path="..."` with `:source="{ kind: 'url', value: ... }"` or, temporarily, `src="..."`. |
+| Events and control | `@animControl` exposed the raw lottie instance. | `@ready` returns the animation instance, and the component exposes ref methods such as `play()`, `pause()`, and `getAnimation()`. | Replace `@animControl` listeners with `@ready` and/or a component ref. |
+| Default runtime | Used the full `lottie-web` runtime by default. | Uses `lottie-web/build/player/lottie_light` by default. | If an animation depends on After Effects expressions, import from `vue-lottie-player/full`. |
+| Public entrypoints | Consumers could reach package internals such as `src/index.js`. | Package exports are now limited to documented entrypoints. | Use only `vue-lottie-player`, `vue-lottie-player/full`, and `vue-lottie-player/style.css`. |
+
+Additional migration notes:
+
+- `source`, `src`, and `animationData` are now validated more strictly; invalid combinations emit an `error` event instead of silently continuing
+- Nuxt usage should stay client-only because `lottie-web` depends on browser APIs
+- `loop`, `autoplay`, `renderer`, `width`, `height`, and `background` keep the same general behavior, so most markup changes are around registration, source props, and control flow
+
+For new code, prefer `source` and the named exports exclusively.
+
+## Local Development
+
+This repository includes the library and two local example apps.
+
+Build the package:
+
+```bash
+npm install
+npm run build
+```
+
+Run the Vue example wired to local source:
+
+```bash
+npm run dev:vue
+```
+
+Run the example apps directly:
+
+```bash
+cd examples/vue
+npm install
+npm run dev
+```
+
+```bash
+cd examples/nuxt
+npm install
+npm run dev
+```
+
+Relevant project areas:
+
+- `src/components/` for the exported Vue components
+- `src/core/` for source resolution, lazy loading, and event wiring
+- `src/styles/index.css` for package styles
+- `examples/vue/` for the Vite example
+- `examples/nuxt/` for the Nuxt 3 example
+- `docs/` for focused usage, props, and events references
+
+## License
+
+[MIT](./LICENSE)

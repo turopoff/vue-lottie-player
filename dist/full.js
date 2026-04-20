@@ -120,7 +120,7 @@ const W = {
 };
 let p = null;
 function q() {
-  return p || (p = import("lottie-web/build/player/lottie_light")), p.then((e) => e.default || e);
+  return p || (p = import("lottie-web")), p.then((e) => e.default || e);
 }
 async function G({
   container: e,

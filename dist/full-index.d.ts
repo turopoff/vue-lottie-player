@@ -1,0 +1,107 @@
+import type { Plugin } from "vue";
+declare const VueLottiePlayerPlugin: Plugin;
+declare const VueLottiePlayer: import("vue").DefineComponent<import("vue").ExtractPropTypes<{
+    name: {
+        type: StringConstructor;
+        default: typeof import("./core/props.js").createDefaultName;
+    };
+    width: {
+        type: import("vue").PropType<string | number>;
+        default: string;
+    };
+    height: {
+        type: import("vue").PropType<string | number>;
+        default: string;
+    };
+    background: {
+        type: StringConstructor;
+        default: string;
+    };
+    loop: {
+        type: import("vue").PropType<number | boolean>;
+        default: boolean;
+    };
+    autoplay: {
+        type: BooleanConstructor;
+        default: boolean;
+    };
+    renderer: {
+        type: import("vue").PropType<import("lottie-web").RendererType>;
+        default: string;
+    };
+    source: {
+        type: import("vue").PropType<import("./types.js").LottieSource | null>;
+        default: null;
+    };
+    src: {
+        type: StringConstructor;
+        default: null;
+    };
+    animationData: {
+        type: import("vue").PropType<any>;
+        default: null;
+    };
+}>, {
+    animContainer: import("vue").Ref<HTMLDivElement | null, HTMLDivElement | null>;
+    style: import("vue").ComputedRef<import("vue").CSSProperties>;
+}, {}, {}, {}, import("vue").ComponentOptionsMixin, import("vue").ComponentOptionsMixin, {
+    ready: (animation: import("lottie-web").AnimationItem) => boolean;
+    error: (error: Error) => boolean;
+}, string, import("vue").PublicProps, Readonly<import("vue").ExtractPropTypes<{
+    name: {
+        type: StringConstructor;
+        default: typeof import("./core/props.js").createDefaultName;
+    };
+    width: {
+        type: import("vue").PropType<string | number>;
+        default: string;
+    };
+    height: {
+        type: import("vue").PropType<string | number>;
+        default: string;
+    };
+    background: {
+        type: StringConstructor;
+        default: string;
+    };
+    loop: {
+        type: import("vue").PropType<number | boolean>;
+        default: boolean;
+    };
+    autoplay: {
+        type: BooleanConstructor;
+        default: boolean;
+    };
+    renderer: {
+        type: import("vue").PropType<import("lottie-web").RendererType>;
+        default: string;
+    };
+    source: {
+        type: import("vue").PropType<import("./types.js").LottieSource | null>;
+        default: null;
+    };
+    src: {
+        type: StringConstructor;
+        default: null;
+    };
+    animationData: {
+        type: import("vue").PropType<any>;
+        default: null;
+    };
+}>> & Readonly<{
+    onError?: ((error: Error) => any) | undefined;
+    onReady?: ((animation: import("lottie-web").AnimationItem) => any) | undefined;
+}>, {
+    animationData: any;
+    src: string;
+    source: import("./types.js").LottieSource | null;
+    name: string;
+    width: string | number;
+    height: string | number;
+    background: string;
+    loop: number | boolean;
+    autoplay: boolean;
+    renderer: import("lottie-web").RendererType;
+}, {}, {}, {}, string, import("vue").ComponentProvideOptions, true, {}, any>;
+export { VueLottiePlayer, VueLottiePlayerPlugin };
+export type { LottieDataSource, LottieSource, LottieUrlSource, VueLottiePlayerInstance, VueLottiePlayerProps } from "./types.js";
