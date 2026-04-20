@@ -15,11 +15,11 @@ defineOptions({
 const remoteSources = [
   {
     label: 'Shape animation',
-    url: 'https://raw.githubusercontent.com/turopoff/vue-lottie-player/vue3/examples/animations/shape-animation.json',
+    url: 'https://raw.githubusercontent.com/turopoff/vue-lottie-player/master/examples/animations/shape-animation.json',
   },
   {
     label: 'Scooter',
-    url: 'https://raw.githubusercontent.com/turopoff/vue-lottie-player/vue3/examples/animations/scooter.json',
+    url: 'https://raw.githubusercontent.com/turopoff/vue-lottie-player/master/examples/animations/scooter.json',
   },
 ]
 

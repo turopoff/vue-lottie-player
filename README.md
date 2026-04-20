@@ -15,7 +15,7 @@ This repository contains the published package in `src/`, shared demo animations
 
 Examples and focused docs:
 
-- [Live demo](https://turopoff.github.io/vue-lottie-player/examples/vue/dist/)
+- [Live demo](https://turopoff.github.io/vue-lottie-player)
 - [Vue example app](./examples/vue)
 - [Nuxt 3 example app](./examples/nuxt)
 - [Usage notes](./docs/usage.md)

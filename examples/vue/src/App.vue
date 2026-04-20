@@ -5,18 +5,18 @@ import workoutMonkeyAnimation from "../../animations/scooter.json";
 import type {
   LottieDataSource,
   LottieUrlSource,
-  VueLottiePlayerInstance
+  VueLottiePlayerInstance,
 } from "vue-lottie-player";
 import { VueLottiePlayer } from "vue-lottie-player";
 
 const remoteSources = [
   {
     label: "Shape animation",
-    url: "https://raw.githubusercontent.com/turopoff/vue-lottie-player/vue3/examples/animations/shape-animation.json",
+    url: "https://raw.githubusercontent.com/turopoff/vue-lottie-player/master/examples/animations/shape-animation.json",
   },
   {
     label: "Scooter",
-    url: "https://raw.githubusercontent.com/turopoff/vue-lottie-player/vue3/examples/animations/scooter.json",
+    url: "https://raw.githubusercontent.com/turopoff/vue-lottie-player/master/examples/animations/scooter.json",
   },
 ];
 
@@ -33,11 +33,11 @@ const activeRemoteSource = computed(
 );
 const activeRemotePlayerSource = computed<LottieUrlSource>(() => ({
   kind: "url",
-  value: activeRemoteSource.value.url
+  value: activeRemoteSource.value.url,
 }));
 const localAnimationSource: LottieDataSource = {
   kind: "data",
-  value: workoutMonkeyAnimation
+  value: workoutMonkeyAnimation,
 };
 const playersReady = computed(
   () => remoteReadyCount.value > 0 && localReadyCount.value > 0,
@@ -81,10 +81,7 @@ const stopAll = () => {
   localPlayer.value?.stop();
 };
 
-const getSafeSeekFrame = (
-  playerRef: typeof remotePlayer,
-  targetFrame = 45
-) => {
+const getSafeSeekFrame = (playerRef: typeof remotePlayer, targetFrame = 45) => {
   const animation = playerRef.value?.getAnimation?.();
 
   if (!animation) {
@@ -190,7 +187,13 @@ watch(speed, applySpeed);
 
       <label class="speed-control">
         <span>Speed: {{ speed.toFixed(1) }}x</span>
-        <input v-model.number="speed" type="range" min="0.2" max="3" step="0.1" />
+        <input
+          v-model.number="speed"
+          type="range"
+          min="0.2"
+          max="3"
+          step="0.1"
+        />
       </label>
 
       <div class="button-row">
